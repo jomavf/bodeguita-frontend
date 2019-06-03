@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import axios from 'axios'
 
 import "./Auth.css"
 
@@ -7,21 +8,40 @@ class AuthPage extends Component {
         super(props)
         this.codeEl = React.createRef()
         this.passwordEl = React.createRef()
+        this.state = {
+            message: "",
+            success:false
+        }
     }
 
-    submitHandler = (event) => {
+    submitHandler = async (event) => {
         event.preventDefault()
         const code = this.codeEl.current.value
         const password = this.passwordEl.current.value
 
         if(code.trim().length === 0 || password.trim().length === 0){
-            return 
+             return this.setState({
+                 message:"Ingrese datos válidos"
+             })
         }
-        // ... request to the backend
+        let response = await axios.get('http://localhost:8000/user')
+        let data = response.data.data
+        console.log(data)
+        data.forEach(user => {
+            if(code === user.code && password === user.password){
+                console.log("entre",code,password)
+                this.setState({success:true})
+                this.props.history.push("/products")
+            }
+        })
+        if(!this.state.success){
+            this.setState({message:"Datos inválidos"})
+        }
+        localStorage.token="easytoken"
     }
 
     render(){
-        return <form className="auth-form" onSubmit={this.submitHandler}>
+        return <form className="auth-form" onSubmit={(event) => this.submitHandler(event)}>
             <div className="form-control">
                 <label htmlFor="code">Codigo</label>
                 <input type="text" id="code" ref={this.codeEl}></input>
@@ -33,6 +53,7 @@ class AuthPage extends Component {
             <div className="form-actions">
                 <button type="submit">Ingresar</button>
             </div>
+            <span>{this.state.message}</span>
         </form>
     }
 }

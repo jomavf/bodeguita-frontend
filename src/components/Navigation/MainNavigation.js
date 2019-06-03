@@ -11,8 +11,8 @@ const mainNavigation = props => (
         <nav className="main-navigation__items">
             <ul>
                 <li><NavLink to="/auth">Authenticate</NavLink></li>
-                <li><NavLink to="/products">Products</NavLink></li>
-                <li><NavLink to="/categories">Categories</NavLink></li>
+                {localStorage.token && <li><NavLink to="/products">Products</NavLink></li>}
+                {localStorage.token && <li><NavLink to="/categories">Categories</NavLink></li>}
             </ul>
         </nav>
     </header>
