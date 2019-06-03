@@ -17,8 +17,6 @@ class AuthPage extends Component {
         if(code.trim().length === 0 || password.trim().length === 0){
             return 
         }
-
-        console.log(code,password)
         // ... request to the backend
     }
 
