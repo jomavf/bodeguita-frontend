@@ -4,14 +4,18 @@ import axios from 'axios'
 class ProductPage extends Component {
     constructor(){
         super()
+        this.name = React.createRef()
+        this.quantity = React.createRef()
+        this.price = React.createRef()
+        this.type = React.createRef()
+        this.discount = React.createRef()
         this.state = {
+            nationality:'Peruana',
+
             title1: 'Registrar un nuevo producto',
             title2: 'Listado de productos',
-            newProductName:'',
-            newProductQuantity:'',
-            newProductPrice:'',
-            newProductDiscount:'',
             products:[],
+            types:['Embutidos','Electrodomésticos','Otros'],
             message: "Añadido exitosamente",
             success:false,
         } 
@@ -20,84 +24,111 @@ class ProductPage extends Component {
     componentDidMount() {
         axios.get('http://localhost:8000/product').then(response => {
             const products = response.data.data
-            this.setState({
-                products
-            })
-        })    
+            this.setState({products})
+        })   
     }
-    async formSubmitted(event){
+    formSubmitted = async (event) => {
         event.preventDefault()
-        let newProduct = {
-            name: this.state.newProductName,
-            quantity:this.state.newProductQuantity,
-            price:this.state.newProductPrice,
-            discount:this.state.newProductDiscount
+
+        const name = this.name.current.value
+        const quantity = this.quantity.current.value
+        const price = this.price.current.value
+        const type = this.type.current.value
+        const discount = this.discount.current.checked
+        const nationality = this.state.nationality
+        let product = {
+            name,
+            quantity,
+            price,
+            type,
+            discount,
+            nationality
         }
-        this.setState({
-            newProductName:'',
-            newProductQuantity:'',
-            newProductPrice:'',
-            newProductDiscount:'',
-        })
-        let response = await axios.post('http://localhost:8000/product',newProduct)
+        console.log(product)
+        await axios.post('http://localhost:8000/product',product)
         this.setState({success:true})
         let getResponse = await axios.get('http://localhost:8000/product')
-        let newData = getResponse.data.data
+        let data = getResponse.data.data
         this.setState({
-            products: newData
+            products: data
         })
         setInterval(() => {
             this.setState({success:false})
         }, 3000);
     }
-    newProductNameChanged(event){
-        this.setState({
-            newProductName: event.target.value
+
+    deleteProduct = (id) => {
+        let url = `http://localhost:8000/product/${id}`
+        axios.delete(url).then((res)=>{
+            console.log(res)
+            return axios.get("http://localhost:8000/product")
+        }).then((response)=>{
+            this.setState({products:response.data.data})
         })
     }
-    newProductQuantityChanged(event){
-        this.setState({
-            newProductQuantity: event.target.value
-        })
+
+    changeRadioButton = (event) => {
+        let nationality = event.target.value
+        this.setState({nationality})
     }
-    newProductPriceChanged(event){
-        this.setState({
-            newProductPrice: event.target.value
-        })
-    }
-    newProductDiscountChanged(event){
-        this.setState({
-            newProductDiscount: event.target.value
-        })
-    }
+
     render(){
         return (
             <div>
                 <h1>{this.state.title1}</h1>
                 <hr></hr>
-                <form onSubmit={this.formSubmitted.bind(this)}>
+                <form onSubmit={this.formSubmitted}>
 
-                    <label htmlFor="newProductName">Nombre</label><br/>
-                    <input onChange={(event)=>this.newProductNameChanged(event)} htmlFor="newProductName" name="newProductName" value={this.state.newProductName}/><br/>
+                    <label htmlFor="name">Nombre</label>
+                    <input htmlFor="name" name="name" ref={this.name}/><br/>
 
-                    <label htmlFor="newProductQuantity">Cantidad</label><br/>
-                    <input onChange={(event)=>this.newProductQuantityChanged(event)} htmlFor="newProductQuantity" name="newProductQuantity" value={this.state.newProductQuantity}/><br/>
+                    <label htmlFor="quantity">Cantidad</label>
+                    <input htmlFor="quantity" name="quantity" ref={this.quantity}/><br/>
 
-                    <label htmlFor="newProductPrice">Precio</label><br/>
-                    <input onChange={(event)=>this.newProductPriceChanged(event)} htmlFor="newProductPrice" name="newProductPrice" value={this.state.newProductPrice}/><br/>
+                    <label htmlFor="price">Precio</label>
+                    <input htmlFor="price" name="price" ref={this.price}/><br/>
 
-                    <label htmlFor="newProductDiscount">Descuento</label><br/>
-                    <input onChange={(event)=>this.newProductDiscountChanged(event)} htmlFor="newProductDiscount" name="newProductDiscount" value={this.state.newProductDiscount}/><br/>
+                    <label htmlFor="type">Tipo</label>
+                    <select htmlFor="type" ref={this.type}>
+                        {this.state.types.map((type,index) => <option key={index} value={type} name="newProductType">{type}</option>)}
+                    </select>
+                    <br/>
 
-                    <button type="submit">Guardar</button>
-                    <br></br>
+                    <label htmlFor="discount">Descuento</label>
+                    <input type="checkbox" htmlFor="discount" name="discount" ref={this.discount}/><br/>
+
+                    <label htmlFor="nationality">Nacionalidad</label>
+                    <input 
+                        type="radio" 
+                        htmlFor="nationality" 
+                        name="nationality" 
+                        value='Peruana' 
+                        checked={this.state.nationality ==='Peruana'} 
+                        onChange={this.changeRadioButton}/>Peruana
+                    <input 
+                        type="radio" 
+                        htmlFor="nationality" 
+                        name="nationality" 
+                        value="Extranjera" 
+                        checked={this.state.nationality ==='Extranjera'} 
+                        onChange={this.changeRadioButton}/>Extranjera
+                    <br/>
+
+                    <button type="submit">Guardar</button><br/>
+
                     <span>{this.state.success ? this.state.message : ''}</span>
+
                 </form>
                 <hr></hr>
                 <h1>{this.state.title2}</h1>
                 <ul>
                     {this.state.products.map((product,index) =>{
-                        return <li key={index}>{product.name}</li>
+                        return (
+                            <li key={index}>{product.name} 
+                                <button onClick={() => this.props.history.push(`/edit/${product.id}`)}>Editar</button>
+                                <button onClick={()=> this.deleteProduct(product.id)}>Eliminar</button>
+                            </li>
+                        )
                     })}
                 </ul>
             </div>

@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import axios from 'axios'
+import AuthContext from '../context/auth-context'
 
 import "./Auth.css"
 
@@ -14,7 +15,9 @@ class AuthPage extends Component {
         }
     }
 
-    submitHandler = async (event) => {
+    static contextType = AuthContext
+
+    submitHandler = (event) => {
         event.preventDefault()
         const code = this.codeEl.current.value
         const password = this.passwordEl.current.value
@@ -24,20 +27,20 @@ class AuthPage extends Component {
                  message:"Ingrese datos válidos"
              })
         }
-        let response = await axios.get('http://localhost:8000/user')
-        let data = response.data.data
-        console.log(data)
-        data.forEach(user => {
-            if(code === user.code && password === user.password){
-                console.log("entre",code,password)
-                this.setState({success:true})
-                this.props.history.push("/products")
+        axios.get('http://localhost:8000/user').then((response)=>{
+            let data = response.data.data
+            data.forEach(user => {
+                if(code === user.code && password === user.password){
+                    this.setState({success:true})
+                    let token = 'easyHacking'
+                    this.context.login(token)
+                    this.props.history.push("/home")
+                }
+            })
+            if(!this.state.success){
+                this.setState({message:"Datos inválidos"})
             }
         })
-        if(!this.state.success){
-            this.setState({message:"Datos inválidos"})
-        }
-        localStorage.token="easytoken"
     }
 
     render(){
