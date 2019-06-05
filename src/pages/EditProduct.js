@@ -33,7 +33,6 @@ class EditProductPage extends Component {
             this.setState({
                 nationality:product.nationality,
             })
-            // this.state.nationality = product.nationality
         })
     }
 

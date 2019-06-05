@@ -54,7 +54,7 @@ class AuthPage extends Component {
                 <input type="password" id="password" ref={this.passwordEl}></input>
             </div>
             <div className="form-actions">
-                <button type="submit">Ingresar</button>
+                <button id="save" type="submit">Ingresar</button>
             </div>
             <span>{this.state.message}</span>
         </form>

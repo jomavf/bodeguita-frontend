@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import Filter from '../components/Filter'
 import axios from 'axios'
 
 class ProductPage extends Component {
@@ -11,6 +12,7 @@ class ProductPage extends Component {
         this.discount = React.createRef()
         this.state = {
             nationality:'Peruana',
+            filterString: '',
 
             title1: 'Registrar un nuevo producto',
             title2: 'Listado de productos',
@@ -121,8 +123,11 @@ class ProductPage extends Component {
                 </form>
                 <hr></hr>
                 <h1>{this.state.title2}</h1>
+                <Filter onTextChange={text => this.setState({filterString:text})}/>
                 <ul>
-                    {this.state.products.map((product,index) =>{
+                    {this.state.products
+                        .filter(product => product.name.toLowerCase().includes(this.state.filterString.toLowerCase()))
+                        .map((product,index) =>{
                         return (
                             <li key={index}>{product.name} 
                                 <button onClick={() => this.props.history.push(`/edit/${product.id}`)}>Editar</button>
