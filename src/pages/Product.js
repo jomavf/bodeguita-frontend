@@ -10,6 +10,7 @@ class ProductPage extends Component {
         this.price = React.createRef()
         this.type = React.createRef()
         this.discount = React.createRef()
+        this.toDeleteRef = React.createRef()
         this.state = {
             nationality:'Peruana',
             filterString: '',
@@ -19,7 +20,10 @@ class ProductPage extends Component {
             types:['Embutidos','Electrodomésticos','Otros'],
             message: "Añadido exitosamente",
             success:false,
-            deletedSuccessfully:false
+            deletedSuccessfully:false,
+            toDelete: [],
+            messageDelete: "Eliminado exitosamente",
+            isChecked:false,
         } 
     }
     
@@ -30,17 +34,55 @@ class ProductPage extends Component {
         })   
     }
 
-    deleteProduct = (id) => {
+    deleteProduct = async (id) => {
         let url = `http://localhost:8000/product/${id}`
-        axios.delete(url).then((res)=>{
-            console.log(res)
-            return axios.get("http://localhost:8000/product")
-        }).then((response)=>{
-            this.setState({products:response.data.data,deletedSuccessfully:true})
-        })
-        setTimeout(()=>{
-            this.setState({deletedSuccessfully:false})
-        },1500)
+        await axios.delete(url)
+        // let response = await axios.get("http://localhost:8000/product")
+        // this.setState({products:response.data.data,deletedSuccessfully:true})
+    }
+
+    inputOnChange = (e,id) => {
+        if(e.target.checked){
+            let toDelete = [...this.state.toDelete]
+            toDelete.push(id)
+            this.setState({
+                toDelete
+            })
+        } else {
+            let toDelete = [...this.state.toDelete]
+            let i = toDelete.indexOf(id)
+            toDelete.splice(i,1)
+            this.setState({
+                toDelete
+            })
+        }
+    }
+
+    deleteFromTable = async () => {
+        if(this.state.toDelete.length === 0){
+            this.setState({
+                deletedSuccessfully:true,
+                messageDelete: "Seleccione un producto porfavor"
+            })
+            setInterval(()=>{
+                this.setState({
+                    deletedSuccessfully:false,
+                })  
+            },1500)
+            return
+        } else {
+            try {
+                await Promise.all(this.state.toDelete.map(e => this.deleteProduct(e)))
+                let response = await axios.get("http://localhost:8000/product")
+                this.setState({products:response.data.data})
+            } finally {
+                this.setState({
+                    deletedSuccessfully:true,
+                    messageDelete: "Se eliminó de manera correcta el Producto",
+                    toDelete: []
+                })
+            }
+        }
     }
 
     render(){
@@ -54,14 +96,16 @@ class ProductPage extends Component {
                         .filter(product => product.name.toLowerCase().includes(this.state.filterString.toLowerCase()))
                         .map((product,index) =>{
                         return (
-                            <li key={index}>{product.name} 
-                                <button onClick={() => this.props.history.push(`/edit/${product.id}`)}>Editar</button>
-                                <button onClick={()=> this.deleteProduct(product.id)}>Eliminar</button>
-                            </li>
+                                <li key={index}>
+                                    <input  type="checkbox" onChange={(e) => this.inputOnChange(e,product.id)}/>
+                                {product.name} 
+                                    <button onClick={() => this.props.history.push(`/edit/${product.id}`)}>Editar</button>
+                                </li>
                         )
-                    })}
+                    })}                    
                 </ul>
-                <span>{this.state.deletedSuccessfully && "Eliminado exitosamente"}</span>
+                <button onClick={()=> this.deleteFromTable() }>Eliminar</button><br/>
+                <span>{this.state.deletedSuccessfully && this.state.messageDelete}</span>
             </div>
         )
     }
