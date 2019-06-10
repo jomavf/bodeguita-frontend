@@ -4,16 +4,17 @@ import './App.css';
 
 import AuthPage from './pages/Auth'
 import ProductPage from './pages/Product'
-import CategoryPage from './pages/Category'
 import HomePage from './pages/Home'
 import MainNavigation from './components/Navigation/MainNavigation'
 import AuthContext from './context/auth-context'
-import EditProductPage from './pages/EditProduct';
+import EditProductPage from './pages/EditProduct'
+import CreateProductPage from './pages/CreateProduct'
 
 class App extends Component {
   state = {
     token: null,
   }
+  
   login = (token) => {
     this.setState({token})
   }
@@ -21,7 +22,7 @@ class App extends Component {
   logout = () => {
     this.setState({token:null})
   }
- 
+
   render(){
     return (
       <BrowserRouter className="App">
@@ -32,12 +33,11 @@ class App extends Component {
               <Switch>
                 {!this.state.token && <Redirect from="/" to="/auth" exact></Redirect>}
                 {!this.state.token && <Redirect from="/products" to="/auth" exact></Redirect>}
-                {!this.state.token && <Redirect from="/categories" to="/auth" exact></Redirect>}
                 {!this.state.token && <Route path="/auth" component={AuthPage}></Route>}
                 {this.state.token && <Route path="/home" component={HomePage}></Route>}
                 {this.state.token && <Route path="/products" component={ProductPage}></Route>}
+                {this.state.token && <Route path="/create" component={CreateProductPage}></Route>}
                 {this.state.token && <Route path="/edit/:id" component={EditProductPage}></Route>}
-                {this.state.token && <Route path="/categories" component={CategoryPage}></Route>}
               </Switch>
             </main>
           </AuthContext.Provider>
