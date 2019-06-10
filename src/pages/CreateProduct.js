@@ -15,26 +15,60 @@ class CreateProductPage extends Component {
             types:['Embutidos','Electrodomésticos','Otros'],
             message: "Añadido exitosamente",
             success:false,
+
+            isInvalidName: false,
+            isInvalidQuantity: false,
+            isInvalidPrice: false,
         } 
     }
+    isValid = (value) => {
+        if (value.trim().length === 0){
+            return false
+        } else {
+            return true
+        }
+    }
+
     formSubmitted = async (event) => {
         event.preventDefault()
 
         const name = this.name.current.value
-        const quantity = this.quantity.current.value
-        const price = this.price.current.value
+        let quantity = this.quantity.current.value
+        let price = this.price.current.value
         const type = this.type.current.value
         const discount = this.discount.current.checked
         const nationality = this.state.nationality
+
+        if (this.isValid(name)){
+            await this.setState({isInvalidName: false})
+        } else {
+            await this.setState({isInvalidName: true})
+        }
+        if (this.isValid(quantity)){
+            await this.setState({isInvalidQuantity: false})
+        } else {
+            await this.setState({isInvalidQuantity: true})
+        }
+        if (this.isValid(price)){
+            await this.setState({isInvalidPrice: false})
+        } else {
+            await this.setState({isInvalidPrice: true})
+        }
+
+        if(this.state.isInvalidName === true || this.state.isInvalidPrice === true || this.state.isInvalidQuantity === true){
+            console.log("Alguno no es valido")
+            return
+        }
+        
         let product = {
             name,
-            quantity,
-            price,
+            quantity:parseFloat(quantity),
+            price:parseFloat(price),
             type,
             discount,
             nationality
         }
-        console.log(product)
+
         await axios.post('http://localhost:8000/product',product)
         this.setState({success:true})
         let getResponse = await axios.get('http://localhost:8000/product')
@@ -45,15 +79,6 @@ class CreateProductPage extends Component {
         setInterval(() => {
             this.setState({success:false})
         }, 3000);
-    }
-    deleteProduct = (id) => {
-        let url = `http://localhost:8000/product/${id}`
-        axios.delete(url).then((res)=>{
-            console.log(res)
-            return axios.get("http://localhost:8000/product")
-        }).then((response)=>{
-            this.setState({products:response.data.data})
-        })
     }
     changeRadioButton = (event) => {
         let nationality = event.target.value
@@ -66,12 +91,15 @@ class CreateProductPage extends Component {
                 <form onSubmit={this.formSubmitted}>
 
                     <label htmlFor="name">Nombre</label>
+                    <span style={{"color":"red"}}>{this.state.isInvalidName ? " Rellenar este campo correctamente" : ""}</span>
                     <input htmlFor="name" name="name" ref={this.name}/><br/>
 
                     <label htmlFor="quantity">Cantidad</label>
+                    <span style={{"color":"red"}}>{this.state.isInvalidQuantity ? " Rellenar este campo correctamente" : ""}</span>
                     <input htmlFor="quantity" name="quantity" ref={this.quantity}/><br/>
 
                     <label htmlFor="price">Precio</label>
+                    <span style={{"color":"red"}}>{this.state.isInvalidPrice ? " Rellenar este campo correctamente" : ""}</span>
                     <input htmlFor="price" name="price" ref={this.price}/><br/>
 
                     <label htmlFor="type">Tipo</label>

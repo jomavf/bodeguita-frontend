@@ -19,6 +19,7 @@ class ProductPage extends Component {
             types:['Embutidos','Electrodomésticos','Otros'],
             message: "Añadido exitosamente",
             success:false,
+            deletedSuccessfully:false
         } 
     }
     
@@ -27,6 +28,19 @@ class ProductPage extends Component {
             const products = response.data.data
             this.setState({products})
         })   
+    }
+
+    deleteProduct = (id) => {
+        let url = `http://localhost:8000/product/${id}`
+        axios.delete(url).then((res)=>{
+            console.log(res)
+            return axios.get("http://localhost:8000/product")
+        }).then((response)=>{
+            this.setState({products:response.data.data,deletedSuccessfully:true})
+        })
+        setTimeout(()=>{
+            this.setState({deletedSuccessfully:false})
+        },1500)
     }
 
     render(){
@@ -47,6 +61,7 @@ class ProductPage extends Component {
                         )
                     })}
                 </ul>
+                <span>{this.state.deletedSuccessfully && "Eliminado exitosamente"}</span>
             </div>
         )
     }

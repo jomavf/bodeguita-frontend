@@ -14,7 +14,17 @@ class EditProductPage extends Component {
         this.state={
             types:['Embutidos','Electrodomésticos','Otros'],
             product:{},
-            nationality: ''
+            nationality: '',
+            isInvalidName: false,
+            isInvalidQuantity: false,
+            isInvalidPrice: false,
+        }
+    }
+    isValid = (value) => {
+        if (value.trim().length === 0){
+            return false
+        } else {
+            return true
         }
     }
     componentDidMount(){
@@ -41,7 +51,7 @@ class EditProductPage extends Component {
         this.setState({nationality})
     }
 
-    onFormSubmit = (event) => {
+    onFormSubmit = async (event) => {
         event.preventDefault()
         let name = this.name.current.value
         let quantity = this.quantity.current.value
@@ -49,11 +59,33 @@ class EditProductPage extends Component {
         let type = this.type.current.value
         let discount = this.discount.current.checked
         let nationality = this.state.nationality
+
+        if (this.isValid(name)){
+            await this.setState({isInvalidName: false})
+        } else {
+            await this.setState({isInvalidName: true})
+        }
+        if (this.isValid(quantity)){
+            await this.setState({isInvalidQuantity: false})
+        } else {
+            await this.setState({isInvalidQuantity: true})
+        }
+        if (this.isValid(price)){
+            await this.setState({isInvalidPrice: false})
+        } else {
+            await this.setState({isInvalidPrice: true})
+        }
+
+        if(this.state.isInvalidName === true || this.state.isInvalidPrice === true || this.state.isInvalidQuantity === true){
+            console.log("Alguno no es valido")
+            return
+        }
         let product = { name, quantity, price, type, discount, nationality }
         console.log(product)
         const url = (id) => `http://localhost:8000/product/${id}`
         const id = this.props.match.params.id
-        axios.patch(url(id), product).then(() => this.props.history.push('/products'))
+        await axios.patch(url(id), product)
+        this.props.history.push('/products')
     }
 
     render(){
@@ -62,12 +94,15 @@ class EditProductPage extends Component {
                 <h1>Editar producto</h1><hr/>
                 <form onSubmit={this.onFormSubmit}>
                     <label htmlFor="name">Nombre</label>
+                    <span style={{"color":"red"}}>{this.state.isInvalidName ? " Rellenar este campo correctamente" : ""}</span>
                     <input htmlFor="name" name="name" ref={this.name}/><br/>
 
                     <label htmlFor="quantity">Cantidad</label>
+                    <span style={{"color":"red"}}>{this.state.isInvalidQuantity ? " Rellenar este campo correctamente" : ""}</span>
                     <input htmlFor="quantity" name="quantity" ref={this.quantity}/><br/>
 
                     <label htmlFor="price">Precio</label>
+                    <span style={{"color":"red"}}>{this.state.isInvalidPrice ? " Rellenar este campo correctamente" : ""}</span>
                     <input htmlFor="price" name="price" ref={this.price}/><br/>
 
                     <label htmlFor="type">Tipo</label>
