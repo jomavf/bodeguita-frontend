@@ -12,7 +12,7 @@ class CreateProductPage extends Component {
         this.state = {
             nationality:'Peruana',
             title1: 'Registrar un nuevo producto',
-            types:['Embutidos','Electrodomésticos','Otros'],
+            types:['Golosinas','Electrodomésticos','Otros'],
             message: "Se guardó de manera correcta el Producto",
             success:false,
 
