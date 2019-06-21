@@ -12,12 +12,13 @@ class EditProductPage extends Component {
         this.discount = React.createRef()
 
         this.state={
-            types:['Embutidos','Electrodomésticos','Otros'],
+            types:['Electrodomésticos','Golosinas','Otros'],
             product:{},
             nationality: '',
             isInvalidName: false,
             isInvalidQuantity: false,
             isInvalidPrice: false,
+            message:''
         }
     }
     isValid = (value) => {
@@ -85,7 +86,11 @@ class EditProductPage extends Component {
         const url = (id) => `http://localhost:8000/product/${id}`
         const id = this.props.match.params.id
         await axios.patch(url(id), product)
-        this.props.history.push('/products')
+        this.setState({message:"Se actualizó de manera correcta el Producto"})
+        setTimeout(()=>{
+            this.setState({message:""})
+        },2000)
+        // this.props.history.push('/products')
     }
 
     render(){
@@ -94,15 +99,15 @@ class EditProductPage extends Component {
                 <h1>Editar producto</h1><hr/>
                 <form onSubmit={this.onFormSubmit}>
                     <label htmlFor="name">Nombre</label>
-                    <span style={{"color":"red"}}>{this.state.isInvalidName ? " Rellenar este campo correctamente" : ""}</span>
+                    <span style={{"color":"red"}}>{this.state.isInvalidName ? "Rellenar el campo nombre correctamente" : ""}</span>
                     <input htmlFor="name" name="name" ref={this.name}/><br/>
 
                     <label htmlFor="quantity">Cantidad</label>
-                    <span style={{"color":"red"}}>{this.state.isInvalidQuantity ? " Rellenar este campo correctamente" : ""}</span>
+                    <span style={{"color":"red"}}>{this.state.isInvalidQuantity ? "Rellenar el campo cantidad correctamente" : ""}</span>
                     <input htmlFor="quantity" name="quantity" ref={this.quantity}/><br/>
 
                     <label htmlFor="price">Precio</label>
-                    <span style={{"color":"red"}}>{this.state.isInvalidPrice ? " Rellenar este campo correctamente" : ""}</span>
+                    <span style={{"color":"red"}}>{this.state.isInvalidPrice ? "Rellenar el campo precio correctamente" : ""}</span>
                     <input htmlFor="price" name="price" ref={this.price}/><br/>
 
                     <label htmlFor="type">Tipo</label>
@@ -132,6 +137,7 @@ class EditProductPage extends Component {
                     <br/>
 
                     <button type="submit">Actualizar y guardar</button>
+                    <span>{this.state.message}</span>
                 </form>
             </div>
         )

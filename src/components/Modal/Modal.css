@@ -1,0 +1,27 @@
+.modal {
+    width: 90%;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+    position: fixed;
+    top: 20vh;
+}
+
+.modal__header {
+    padding: 1rem;
+    background: blue;
+    color: white;
+}
+
+.modal__header h1 {
+    margin: 0px
+}
+
+.modal__content {
+    padding: 1rem;
+}
+
+.modal__actions{
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem;
+}

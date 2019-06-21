@@ -12,7 +12,7 @@ class CreateProductPage extends Component {
         this.state = {
             nationality:'Peruana',
             title1: 'Registrar un nuevo producto',
-            types:['Golosinas','Electrodomésticos','Otros'],
+            types:['Electrodomésticos','Golosinas','Otros'],
             message: "Se guardó de manera correcta el Producto",
             success:false,
 
@@ -91,15 +91,15 @@ class CreateProductPage extends Component {
                 <form onSubmit={this.formSubmitted}>
 
                     <label htmlFor="name">Nombre</label>
-                    <span style={{"color":"red"}}>{this.state.isInvalidName ? " Nombre es requerido" : ""}</span>
+                    <span style={{"color":"red"}}>{this.state.isInvalidName ? "Nombre es requerido" : ""}</span>
                     <input htmlFor="name" name="name" ref={this.name}/><br/>
 
                     <label htmlFor="quantity">Cantidad</label>
-                    <span style={{"color":"red"}}>{this.state.isInvalidQuantity ? " Cantidad es requerido" : ""}</span>
+                    <span style={{"color":"red"}}>{this.state.isInvalidQuantity ? "Cantidad es requerido" : ""}</span>
                     <input htmlFor="quantity" name="quantity" ref={this.quantity}/><br/>
 
                     <label htmlFor="price">Precio</label>
-                    <span style={{"color":"red"}}>{this.state.isInvalidPrice ? " Precio es requerido" : ""}</span>
+                    <span style={{"color":"red"}}>{this.state.isInvalidPrice ? "Precio es requerido" : ""}</span>
                     <input htmlFor="price" name="price" ref={this.price}/><br/>
 
                     <label htmlFor="type">Tipo</label>
